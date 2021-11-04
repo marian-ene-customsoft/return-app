@@ -770,6 +770,7 @@ class MyReturnsPageAdd extends Component<any, State> {
       iban,
       accountHolder,
       orderProducts,
+      settings
     } = this.state
 
     orderProducts.forEach((product: any) => {
@@ -818,6 +819,23 @@ class MyReturnsPageAdd extends Component<any, State> {
           })
           .then(() => {
             this.showTable()
+            if(settings.allowSMSLinkIntegration) {
+              let smsLinkBody: any = {
+                requestId: response.DocumentId,
+                orderId: requestData.orderId,
+                phone: requestData.phoneNumber,
+                event: 'request-created'
+              }
+              try {
+                fetch(`${fetchPath.sendSMS}`, {
+                  method: fetchMethod.post,
+                  body: JSON.stringify(smsLinkBody),
+                  headers: fetchHeaders,
+                })
+              } catch {
+                // console.log(e)
+              }
+            }
           })
       } else {
         this.setState({
